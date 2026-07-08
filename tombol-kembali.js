@@ -113,7 +113,7 @@ function tampilkanLaporan() {
 // ---------- FUNGSI MEMBUAT TOMBOL KEMBALI (HANYA UNTUK NON-INDEX) ----------
 function buatTombolKembali() {
     const tombol = document.createElement('button');
-    tombol.textContent = '🏠 Kembali ke Beranda';
+    tombol.textContent = '🏠 Home';
     tombol.id = 'tombolKembali';
     tombol.style.cssText = `
         position: fixed;
