@@ -4,17 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Frame Berita Viral Otomatis (Rasio Fleksibel)</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-        <!-- Tambahkan tombol kembali -->
-    <script src="../tombol-kembali.js"></script>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DV25BYV3TL"></script>
-    <script>
+    
+      ===============
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-DV25BYV3TL"></script>
+  <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-DV25BYV3TL');
-    </script>
+  </script>
+  ===============
+    <!-- Tambahkan tombol kembali -->
+    <script src="../tombol-kembali.js"></script>
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -68,28 +71,45 @@
             letter-spacing: 0.5px;
         }
 
-        .form-group textarea {
+        .form-group textarea, .form-group select {
             width: 100%;
-            height: 70px;
             padding: 10px;
             border: 1px solid #ced4da;
             border-radius: 8px;
-            resize: none;
             font-size: 15px;
             outline: none;
             transition: border-color 0.2s;
+            background-color: white;
         }
-        .form-group textarea:focus {
+        .form-group textarea {
+            height: 70px;
+            resize: none;
+        }
+        .form-group textarea:focus, .form-group select:focus {
             border-color: #007bff;
         }
 
-        .form-group input[type="file"] {
-            width: 100%;
-            padding: 8px;
+        /* Group Tombol Upload Galeri & Kamera */
+        .upload-options {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-upload-opt {
+            flex: 1;
+            padding: 10px;
             background: #f8f9fa;
             border: 1px dashed #adbcce;
             border-radius: 8px;
             cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.2s;
+        }
+        .btn-upload-opt:hover {
+            background: #e9ecef;
+            border-color: #007bff;
         }
 
         /* Input Slider untuk Zoom Bingkai/Frame Berita */
@@ -103,56 +123,16 @@
             cursor: pointer;
         }
 
-        /* Template Selector Grid */
-        .template-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-bottom: 15px;
-            max-height: 250px;
-            overflow-y: auto;
-            padding: 5px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            background: #fafafa;
-        }
-
-        .btn-tpl {
-            background: white;
-            color: #333;
-            border: 1.5px solid #e9ecef;
-            padding: 8px 6px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            text-align: left;
+        .action-buttons {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-        .btn-tpl:hover {
-            background: #f1f3f5;
-        }
-        .btn-tpl.active {
-            background: #e7f1ff;
-            border-color: #007bff;
-            color: #0056b3;
-        }
-        .btn-tpl .color-badge {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            flex-shrink: 0;
+            gap: 10px;
         }
 
         .btn-download {
+            flex: 2;
             background-color: #28a745;
             color: white;
-            width: 100%;
-            font-size: 16px;
+            font-size: 15px;
             padding: 12px;
             border: none;
             border-radius: 8px;
@@ -167,10 +147,29 @@
         }
         .btn-download:hover { background-color: #218838; transform: translateY(-1px); }
 
-        /* Area Cetak Kanvas Preview Utama - Diubah menjadi FLEKSIBEL mengikuti rasio gambar asli */
+        .btn-share {
+            flex: 1;
+            background-color: #007bff;
+            color: white;
+            font-size: 15px;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
+            transition: all 0.2s;
+        }
+        .btn-share:hover { background-color: #0056b3; transform: translateY(-1px); }
+
+        /* Area Cetak Kanvas Preview Utama */
         .canvas-container {
             width: 100%;
-            max-width: 500px; /* Ukuran preview maksimal di layar biar tidak kekecilan/kebesaran */
+            max-width: 500px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
@@ -178,7 +177,7 @@
             background-color: #222;
         }
 
-        /* Gambar latar belakang nyata agar kita bisa mengambil aspek rasionya secara dinamis */
+        /* Gambar latar belakang nyata */
         .bg-image-render {
             display: block;
             width: 100%;
@@ -224,9 +223,7 @@
         
         .hidden { display: none !important; }
 
-        /* ========================================================
-           STYLE CSS TEMPLATE SEBELUMNYA (1 - 18)
-           ======================================================== */
+        /* STYLE CSS TEMPLATE (1 - 18) */
         .tpl-lambe { background: white; width: 100%; border-radius: 18px; padding: 35px 25px 25px 25px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); text-align: center; position: relative; }
         .tpl-lambe::before, .tpl-lambe::after { content: ""; position: absolute; top: 25px; width: 35px; height: 5px; background-color: #e60000; transform: skewX(-30deg); }
         .tpl-lambe::before { left: 25px; } .tpl-lambe::after { right: 25px; }
@@ -330,9 +327,19 @@
             <textarea id="textInput" placeholder="Ketik isi berita utama...">Generator Frame Berita Viral Master</textarea>
         </div>
 
+        <!-- 3. Upload dari Galeri dan Kamera -->
         <div class="form-group">
-            <label for="bgInput">Ganti Gambar Latar Belakang (Mendukung Semua Rasio):</label>
-            <input type="file" id="bgInput" accept="image/*">
+            <label>Ganti Gambar Latar Belakang:</label>
+            <div class="upload-options">
+                <label class="btn-upload-opt">
+                    📁 Pilih dari Galeri
+                    <input type="file" id="bgInputGallery" accept="image/*" class="hidden">
+                </label>
+                <label class="btn-upload-opt">
+                    📷 Ambil foto Kamera
+                    <input type="file" id="bgInputCamera" accept="image/*" capture="environment" class="hidden">
+                </label>
+            </div>
         </div>
 
         <div class="form-group">
@@ -344,34 +351,40 @@
             </div>
         </div>
         
+        <!-- 2. Dropdown Model Desain -->
         <div class="form-group">
-            <label>Pilih Model Desain Tampilan (18 Pilihan):</label>
-            <div class="template-grid">
-                <button class="btn-tpl active" onclick="switchTemplate(1, this)"><span class="color-badge" style="background: #e60000;"></span> 1. Lambe Turah</button>
-                <button class="btn-tpl" onclick="switchTemplate(2, this)"><span class="color-badge" style="background: #e6b800;"></span> 2. Viralin Akurat</button>
-                <button class="btn-tpl" onclick="switchTemplate(3, this)"><span class="color-badge" style="background: #007bff;"></span> 3. Shock Therapy</button>
-                <button class="btn-tpl" onclick="switchTemplate(4, this)"><span class="color-badge" style="background: #be1a1a;"></span> 4. iNews Red</button>
-                <button class="btn-tpl" onclick="switchTemplate(5, this)"><span class="color-badge" style="background: #4cd1ec;"></span> 5. Talent News</button>
-                <button class="btn-tpl" onclick="switchTemplate(6, this)"><span class="color-badge" style="background: #1e4ba1;"></span> 6. Begal Border</button>
-                <button class="btn-tpl" onclick="switchTemplate(7, this)"><span class="color-badge" style="background: #0064b0;"></span> 7. Tribun Round</button>
-                <button class="btn-tpl" onclick="switchTemplate(8, this)"><span class="color-badge" style="background: #be1a1a;"></span> 8. TWS Block</button>
-                
-                <button class="btn-tpl" onclick="switchTemplate(9, this)"><span class="color-badge" style="background: #000000;"></span> 9. Muara Enim</button>
-                <button class="btn-tpl" onclick="switchTemplate(10, this)"><span class="color-badge" style="background: #0099ff;"></span> 10. Lubuklinggau</button>
-                <button class="btn-tpl" onclick="switchTemplate(11, this)"><span class="color-badge" style="background: #004085;"></span> 11. Ponpes Blue</button>
-                <button class="btn-tpl" onclick="switchTemplate(12, this)"><span class="color-badge" style="background: #1a66b2;"></span> 12. Tribun Timur</button>
-                <button class="btn-tpl" onclick="switchTemplate(13, this)"><span class="color-badge" style="background: #ff6600;"></span> 13. Sapi Orange</button>
-                <button class="btn-tpl" onclick="switchTemplate(14, this)"><span class="color-badge" style="background: #4a0082;"></span> 14. Waeboto Viol</button>
-                <button class="btn-tpl" onclick="switchTemplate(15, this)"><span class="color-badge" style="background: #c2a673;"></span> 15. News Info</button>
-                <button class="btn-tpl" onclick="switchTemplate(16, this)"><span class="color-badge" style="background: #dddddd;"></span> 16. Quotes Mark</button>
-                <button class="btn-tpl" onclick="switchTemplate(17, this)"><span class="color-badge" style="background: #e60000;"></span> 17. Red Map Badge</button>
-                <button class="btn-tpl" onclick="switchTemplate(18, this)"><span class="color-badge" style="background: #b30000;"></span> 18. Thick Red Side</button>
-            </div>
+            <label for="templateSelect">Pilih Model Desain Tampilan:</label>
+            <select id="templateSelect" onchange="switchTemplate(this.value)">
+                <option value="1">1. Lambe Turah</option>
+                <option value="2">2. Viralin Akurat</option>
+                <option value="3">3. Shock Therapy</option>
+                <option value="4">4. iNews Red</option>
+                <option value="5">5. Talent News</option>
+                <option value="6">6. Begal Border</option>
+                <option value="7">7. Tribun Round</option>
+                <option value="8">8. TWS Block</option>
+                <option value="9">9. Muara Enim</option>
+                <option value="10">10. Lubuklinggau</option>
+                <option value="11">11. Ponpes Blue</option>
+                <option value="12">12. Tribun Timur</option>
+                <option value="13">13. Sapi Orange</option>
+                <option value="14">14. Waeboto Viol</option>
+                <option value="15">15. News Info</option>
+                <option value="16">16. Quotes Mark</option>
+                <option value="17">17. Red Map Badge</option>
+                <option value="18">18. Thick Red Side</option>
+            </select>
         </div>
 
-        <button class="btn-download" onclick="exportToImage()">
-            💾 Unduh Gambar Hasil Akhir (Sesuai Ukuran Asli)
-        </button>
+        <!-- 4. Tombol Download dan Share -->
+        <div class="action-buttons">
+            <button class="btn-download" onclick="exportToImage()">
+                💾 Unduh Gambar
+            </button>
+            <button class="btn-share" onclick="shareImage()">
+                🔗 Bagikan
+            </button>
+        </div>
     </div>
 
     <div id="canvasArea" class="canvas-container">
@@ -380,7 +393,6 @@
         <div class="bg-overlay"></div>
         
         <div id="movableFrame" class="frame-wrapper">
-            
             <div id="tpl1" class="tpl-lambe">
                 <div class="logo-lambe"><span>💋</span><div class="brand">BIBAI</div></div>
                 <div class="text-box text-target"></div>
@@ -410,7 +422,6 @@
                 <div class="logo-tws"><div class="logo-tws-icon"></div> TWS</div>
                 <div id="twsContainer" style="display:flex; flex-direction:column; gap:4px; width:100%;"></div>
             </div>
-
             <div id="tpl9" class="tpl-muaraenim hidden">
                 <div class="text-box text-target"></div>
                 <div class="badge-muaraenim-bottom">cubocubotoday</div>
@@ -455,7 +466,6 @@
                 <div class="side-frame-red"></div>
                 <div id="thickredLinesContainer" style="display:flex; flex-direction:column; gap:4px; width:100%;"></div>
             </div>
-
         </div>
     </div>
     
@@ -463,7 +473,8 @@
 
     <script>
         const textInput = document.getElementById('textInput');
-        const bgInput = document.getElementById('bgInput');
+        const bgInputGallery = document.getElementById('bgInputGallery');
+        const bgInputCamera = document.getElementById('bgInputCamera');
         const zoomInput = document.getElementById('zoomInput');
         const canvasArea = document.getElementById('canvasArea');
         const bgImageRender = document.getElementById('bgImageRender');
@@ -480,10 +491,10 @@
         let currentX = 0, currentY = 0;
         let currentScale = 1;
 
-        // Fungsi memperbarui teks info ukuran aspek rasio asli gambar latar belakang
+        // 1. Memperbarui teks & rasio gambar asli
         function updateRatioDisplay() {
-            if (bgImageRender.naturalWidth) {
-                ratioInfo.textContent = `Dimensi Gambar Hasil Cetak Berubah Mengikuti Ukuran Asli: ${bgImageRender.naturalWidth} x ${bgImageRender.naturalHeight} piksel`;
+            if (bgImageRender.naturalWidth && bgImageRender.naturalHeight) {
+                ratioInfo.textContent = `Dimensi Gambar Hasil Cetak Presisi: ${bgImageRender.naturalWidth} x ${bgImageRender.naturalHeight} piksel`;
             }
         }
         bgImageRender.addEventListener('load', updateRatioDisplay);
@@ -579,50 +590,84 @@
             refreshAllTexts(this.value);
         });
 
-        // Handler Ganti Gambar Latar Belakang (Dinamis merubah ukuran wadah)
-        bgInput.addEventListener('change', function(e) {
+        // 3. Handler Unggah Gambar (Galeri & Kamera)
+        function handleImageUpload(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     bgImageRender.src = event.target.result;
-                    // Reset posisi geser bingkai ke tengah-bawah bawaan agar pas saat rasio berubah
                     currentX = 0;
                     currentY = 0;
                     updateFrameTransform();
                 };
                 reader.readAsDataURL(file);
             }
-        });
+        }
+        bgInputGallery.addEventListener('change', handleImageUpload);
+        bgInputCamera.addEventListener('change', handleImageUpload);
 
-        function switchTemplate(index, currentButton) {
+        // 2. Switch Template via Dropdown
+        function switchTemplate(index) {
             for (let i = 1; i <= 18; i++) {
                 const el = document.getElementById('tpl' + i);
                 if(el) el.classList.add('hidden');
             }
             document.getElementById('tpl' + index).classList.remove('hidden');
+        }
 
-            const allButtons = document.querySelectorAll('.btn-tpl');
-            allButtons.forEach(btn => btn.classList.remove('active'));
-            currentButton.classList.add('active');
+        // Helper untuk memproses render canvas presisi rasio asli
+        function renderCanvasToBlob() {
+            const nativeWidth = bgImageRender.naturalWidth || canvasArea.clientWidth;
+            const currentWidth = canvasArea.clientWidth;
+            const scaleFactor = nativeWidth / currentWidth;
+
+            return html2canvas(canvasArea, {
+                useCORS: true,
+                allowTaint: true,
+                scale: scaleFactor, 
+                logging: false
+            });
         }
 
         function exportToImage() {
-            // Mengambil rasio skala HD berdasarkan resolusi asli gambar agar jernih sempurna
-            const renderScale = Math.max(2, 2000 / bgImageRender.naturalWidth);
-            
-            html2canvas(canvasArea, {
-                useCORS: true,
-                allowTaint: true,
-                scale: renderScale, 
-                logging: false
-            }).then(canvas => {
+            renderCanvasToBlob().then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'frame_berita_viral_HD.jpg';
                 link.href = canvas.toDataURL('image/jpeg', 0.95);
                 link.click();
             }).catch(err => {
                 alert('Gagal mengekspor gambar.');
+                console.error(err);
+            });
+        }
+
+        // 4. Fitur Bagikan (Web Share API)
+        function shareImage() {
+            renderCanvasToBlob().then(canvas => {
+                canvas.toBlob(blob => {
+                    if (!blob) {
+                        alert('Gagal memproses gambar untuk dibagikan.');
+                        return;
+                    }
+                    const file = new File([blob], 'frame_berita.jpg', { type: 'image/jpeg' });
+
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'Frame Berita Viral',
+                            text: textInput.value
+                        }).catch(err => {
+                            if (err.name !== 'AbortError') {
+                                alert('Gagal membagikan gambar.');
+                            }
+                        });
+                    } else {
+                        alert('Fitur berbagi tidak didukung di browser ini. Silakan unduh gambar secara manual.');
+                    }
+                }, 'image/jpeg', 0.95);
+            }).catch(err => {
+                alert('Gagal memproses gambar.');
                 console.error(err);
             });
         }
