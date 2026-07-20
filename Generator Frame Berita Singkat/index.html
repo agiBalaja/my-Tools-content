@@ -4,14 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Frame Berita Singkat v2.0</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  ===============
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-DV25BYV3TL"></script>
-    <script>
+  <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-DV25BYV3TL');
-    </script>
+  </script>
+  ===============
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         :root {
             --theme-color: #cc0000;
@@ -51,12 +54,15 @@
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.25);
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .user-photo {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* Menjaga aspek rasio gambar asli */
             position: absolute;
             top: 0;
             left: 0;
@@ -168,7 +174,7 @@
         }
 
         .form-group label {
-            font-size: 13px;
+            font-size: 10px;
             font-weight: 700;
             color: #444;
             text-transform: uppercase;
@@ -184,33 +190,51 @@
 
         select { cursor: pointer; background: #fff; }
 
-        /* Button Unduh */
-        .btn-download {
-            background-color: #218838;
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* Button Unduh & Share */
+        .btn-download, .btn-share {
+            flex: 1;
             color: white;
             border: none;
-            padding: 14px;
-            font-size: 16px;
+            padding: 14px 10px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
             transition: 0.2s;
-            margin-top: 10px;
             text-transform: uppercase;
+            text-align: center;
+        }
+
+        .btn-download {
+            background-color: #218838;
         }
 
         .btn-download:hover { background-color: #1e7e34; }
         .btn-download:active { transform: scale(0.98); }
+
+        .btn-share {
+            background-color: #007bff;
+        }
+
+        .btn-share:hover { background-color: #0069d9; }
+        .btn-share:active { transform: scale(0.98); }
 
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.4; }
         }
 
-        /* Responsive */
+        /* Responsive & Fleksibilitas Lebar */
         @media (max-width: 800px) {
             .main-wrapper { flex-direction: column; align-items: center; }
-            .frame-container { width: 100%; max-width: 400px; height: 400px; }
+            .frame-container { width: 100%; max-width: 450px; }
+            .button-group { flex-direction: column; }
         }
     </style>
 </head>
@@ -239,8 +263,13 @@
 
         <div class="control-panel">
             <div class="form-group">
-                <label>1. Upload Gambar</label>
+                <label>1. Upload Gambar (Galeri)</label>
                 <input type="file" id="file-input" accept="image/*">
+            </div>
+
+            <div class="form-group">
+                <label>Atau Ambil dari Kamera</label>
+                <input type="file" id="camera-input" accept="image/*" capture="environment">
             </div>
 
             <div class="form-group">
@@ -264,7 +293,10 @@
                 <input type="text" id="text-input" placeholder="Contoh: DOMPET PRIA INI MENANGIS DI AKHIR BULAN" maxlength="65">
             </div>
 
-            <button class="btn-download" id="download-btn">📥 Unduh Gambar</button>
+            <div class="button-group">
+                <button class="btn-download" id="download-btn">📥 Unduh Gambar</button>
+                <button class="btn-share" id="share-btn">📲 Bagikan</button>
+            </div>
         </div>
     </div>
 
@@ -277,14 +309,16 @@
             sport:    { primary: '#1e7e34', accent: '#ffffff', text: '#ffffff', ribbon: 'KABAR ARENA', source: 'SPORT UPDATE', live: '● LIVE MATCH' },
             tech:     { primary: '#0070f3', accent: '#00dfd8', text: '#ffffff', ribbon: 'TEKNO FLASH', source: 'CYBER NEWS', live: '● UPDATE' },
             ekonomi:  { primary: '#0b3c5d', accent: '#328cc1', text: '#ffffff', ribbon: 'PASAR SAHAM', source: 'BUSINESS LATEST', live: '● KURS' },
-            politik:  { primary: '#4f5d75', accent: '#ef8354', text: '#ffffff', ribbon: 'KABAR DEWAN', source: 'POLITIK HARI INI', live: '● LIVE REPORT' },
+            politik:  { primary: '#4f5d75', accent: '#ef8354', text: '#ffffff', ribbon: 'POLITIK HARI INI', live: '● LIVE REPORT' },
             cuaca:    { primary: '#e65c00', accent: '#f9d423', text: '#ffffff', ribbon: 'INFO CUACA', source: 'WEATHER ALERT', live: '● AKTUAL' },
             gaming:   { primary: '#6f42c1', accent: '#e83e8c', text: '#ffffff', ribbon: 'ZONA GAMING', source: 'ESPORTS NEWS', live: '● STREAM' },
             misteri:  { primary: '#2b0040', accent: '#adff2f', text: '#ffffff', ribbon: 'DUNIA LAIN', source: 'MISTERI FAKTA', live: '● HOROR' }
         };
 
         const fileInput = document.getElementById('file-input');
+        const cameraInput = document.getElementById('camera-input');
         const userImg = document.getElementById('user-img');
+        const frameContainer = document.getElementById('frameToCapture');
         const placeholder = document.getElementById('placeholder');
         const themeSelect = document.getElementById('theme-select');
         const textInput = document.getElementById('text-input');
@@ -296,19 +330,41 @@
         const liveTag = document.getElementById('live-tag');
         const headlineText = document.getElementById('headline-text');
         const downloadBtn = document.getElementById('download-btn');
+        const shareBtn = document.getElementById('share-btn');
 
-        // 1. Logika Upload Gambar
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
+        // Fungsi Memproses File Gambar & Menyesuaikan Rasio Kontainer
+        function processImage(file) {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    userImg.src = event.target.result;
-                    userImg.style.display = 'block';
-                    placeholder.style.display = 'none';
+                    const img = new Image();
+                    img.onload = function() {
+                        const aspectRatio = img.width / img.height;
+                        
+                        // Menyesuaikan tinggi kontainer agar sesuai rasio asli gambar yang diupload
+                        const containerWidth = frameContainer.clientWidth;
+                        frameContainer.style.height = (containerWidth / aspectRatio) + 'px';
+                        
+                        userImg.src = event.target.result;
+                        userImg.style.display = 'block';
+                        placeholder.style.display = 'none';
+                    };
+                    img.src = event.target.result;
                 }
                 reader.readAsDataURL(file);
             }
+        }
+
+        // 1. Logika Upload Gambar Galeri
+        fileInput.addEventListener('change', function(e) {
+            processImage(e.target.files[0]);
+            cameraInput.value = ""; // Reset input kamera jika galeri dipilih
+        });
+
+        // Logika Ambil Gambar dari Kamera
+        cameraInput.addEventListener('change', function(e) {
+            processImage(e.target.files[0]);
+            fileInput.value = ""; // Reset input galeri jika kamera digunakan
         });
 
         // 2. Logika Penggantian Tema (10 Variasi)
@@ -362,6 +418,60 @@
                 console.error(err);
                 downloadBtn.innerText = "📥 Unduh Gambar";
                 downloadBtn.disabled = false;
+            });
+        });
+
+        // 5. Logika Share ke Media Sosial
+        shareBtn.addEventListener('click', function() {
+            const frame = document.getElementById('frameToCapture');
+
+            if(userImg.style.display === 'none' || userImg.src === '#') {
+                alert('Silakan upload foto Anda terlebih dahulu!');
+                return;
+            }
+
+            shareBtn.innerText = "Memproses...";
+            shareBtn.disabled = true;
+
+            html2canvas(frame, {
+                useCORS: true,
+                allowTaint: true,
+                scale: 2
+            }).then(canvas => {
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], 'berita-singkat.png', { type: 'image/png' });
+                    const shareData = {
+                        title: 'Berita Singkat',
+                        text: headlineText.innerText,
+                        files: [file]
+                    };
+
+                    // Menggunakan Web Share API jika didukung oleh browser/perangkat
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share(shareData);
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                console.error('Gagal membagikan:', err);
+                            }
+                        }
+                    } else {
+                        // Fallback jika Web Share API tidak mendukung pengiriman file
+                        alert('Fitur berbagi langsung tidak didukung di browser ini. Gambar akan diunduh terlebih dahulu.');
+                        const link = document.createElement('a');
+                        link.download = 'berita-singkat-' + Date.now() + '.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    }
+
+                    shareBtn.innerText = "📲 Bagikan";
+                    shareBtn.disabled = false;
+                }, 'image/png');
+            }).catch(err => {
+                alert('Gagal memproses gambar untuk dibagikan.');
+                console.error(err);
+                shareBtn.innerText = "📲 Bagikan";
+                shareBtn.disabled = false;
             });
         });
     </script>
