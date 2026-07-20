@@ -4,18 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pembuat Gambar Berita Pro</title>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-        <!-- Tambahkan tombol kembali -->
-    <script src="../tombol-kembali.js"></script>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DV25BYV3TL"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-DV25BYV3TL');
     </script>
+    <!-- Tambahkan tombol kembali -->
+    <script src="../tombol-kembali.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -47,23 +45,41 @@
             font-size: 14px;
         }
 
-        .form-group textarea {
+        .form-group textarea,
+        .form-group input[type="text"] {
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
             font-family: inherit;
+        }
+
+        .form-group textarea {
             resize: vertical;
         }
 
-        .form-group input[type="text"],
-        .form-group input[type="file"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
+        /* Styling untuk Tombol Upload Gambar & Kamera */
+        .upload-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-upload {
+            flex: 1;
+            padding: 8px 12px;
+            background-color: #4a5568;
+            color: white;
+            border: none;
             border-radius: 4px;
-            box-sizing: border-box;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .btn-upload:hover {
+            background-color: #2d3748;
         }
 
         .btn-group {
@@ -87,10 +103,11 @@
         .btn-share { background-color: #1565c0; }
         .btn:hover { opacity: 0.9; }
 
+        /* Container gambar akan secara dinamis menyesuaikan tinggi berdasarkan rasio */
         .container-berita {
             position: relative;
             width: 400px;
-            height: 450px;
+            height: auto;
             background-color: #ddd;
             overflow: hidden;
             border-radius: 8px;
@@ -99,8 +116,9 @@
 
         .container-berita img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
+            display: block;
+            object-fit: contain;
         }
 
         .overlay {
@@ -110,52 +128,62 @@
             right: 0;
             height: 65%;
             background: linear-gradient(transparent, rgba(0, 0, 0, 0.85));
+            pointer-events: none;
         }
 
         .konten-teks {
             position: absolute;
-            bottom: 30px;
+            bottom: 20px;
             left: 20px;
             right: 20px;
             color: white;
         }
 
         .judul-berita {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            line-height: 1.2;
-            margin-bottom: 10px;
+            line-height: 1.4;
+            margin-bottom: 5px;
         }
 
+        /* Alas Teks Semi-Transparan */
         .bg-oranye { 
-            background-color: rgba(255, 152, 0, 0.5);
-            color: white; 
-            padding: 1px 8px; 
-            border-radius: 3px; 
-            display: inline-block; 
-            margin-bottom: 0.5px; 
-        }
-        .putih { 
-            background-color: rgba(255, 255, 255, 0.5); 
-            color: white;
-            padding: 1px 8px; 
-            border-radius: 3px; 
-            display: inline-block; 
-            margin-bottom: 2px;
-            text-shadow: 0 0 5px rgba(0,0,0,0.6), 0 0 2px rgba(0,0,0,0.8);
-        }
-        .bg-biru { 
-            background-color: rgba(30, 58, 138, 0.5);
+            background-color: rgba(255, 152, 0, 0.7);
             color: white; 
             padding: 2px 8px; 
             border-radius: 3px; 
             display: inline-block; 
+            margin-bottom: 4px; 
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+        
+        .putih { 
+            background-color: rgba(255, 255, 255, 0.75); 
+            color: #111;
+            padding: 2px 8px; 
+            border-radius: 3px; 
+            display: inline-block; 
+            margin-bottom: 4px;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
+        }
+        
+        .bg-biru { 
+            background-color: rgba(30, 58, 138, 0.7);
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 3px; 
+            display: inline-block; 
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
         }
 
         .sumber-foto {
             font-size: 11px;
-            color: #ccc;
-            margin-bottom: 2px;
+            color: #ddd;
+            margin-bottom: 6px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
         }
     </style>
 </head>
@@ -166,7 +194,13 @@
     <div class="form-panel">
         <div class="form-group">
             <label>1. Pilih Gambar</label>
-            <input type="file" id="upload-gambar" accept="image/*">
+            <div class="upload-options">
+                <button class="btn-upload" onclick="document.getElementById('upload-galeri').click()">🖼️ Galeri</button>
+                <button class="btn-upload" onclick="document.getElementById('upload-kamera').click()">📷 Kamera</button>
+            </div>
+            <!-- Input tersembunyi untuk galeri dan kamera -->
+            <input type="file" id="upload-galeri" accept="image/*" style="display: none;">
+            <input type="file" id="upload-kamera" accept="image/*" capture="environment" style="display: none;">
         </div>
         
         <div class="form-group">
@@ -176,7 +210,6 @@ Melakukan kegiatan P2K2
 Guna Merubah mindset</textarea>
         </div>
         
-        <!-- TAMBAHAN: Input untuk sumber foto -->
         <div class="form-group">
             <label>3. Sumber Foto</label>
             <input type="text" id="input-foto" value="Foto: Istimewa">
@@ -202,10 +235,10 @@ Guna Merubah mindset</textarea>
     </div>
 
     <script>
-        // Ambil elemen-elemen yang dibutuhkan
-        const uploadGambar = document.getElementById('upload-gambar');
+        const uploadGaleri = document.getElementById('upload-galeri');
+        const uploadKamera = document.getElementById('upload-kamera');
         const inputBerita = document.getElementById('input-berita');
-        const inputFoto = document.getElementById('input-foto'); // sekarang ada
+        const inputFoto = document.getElementById('input-foto');
 
         const previewImg = document.getElementById('preview-img');
         const textBaris1 = document.getElementById('text-baris1');
@@ -217,21 +250,22 @@ Guna Merubah mindset</textarea>
         const btnShare = document.getElementById('btn-share');
         const areaBerita = document.getElementById('area-berita');
 
-        // --- Penyesuaian tinggi container berdasarkan rasio gambar ---
-        previewImg.addEventListener('load', function() {
-            const lebarAsli = this.naturalWidth;
-            const tinggiAsli = this.naturalHeight;
+        // --- Penyesuaian Rasio Otomatis ---
+        function sesuaikanRasioGambar() {
+            const lebarAsli = previewImg.naturalWidth;
+            const tinggiAsli = previewImg.naturalHeight;
             
             if (lebarAsli && tinggiAsli) {
                 const lebarContainer = 400; 
                 const tinggiProporsional = (tinggiAsli / lebarAsli) * lebarContainer;
                 areaBerita.style.height = tinggiProporsional + 'px';
             }
-        });
+        }
 
-        // --- Upload gambar ---
-        uploadGambar.addEventListener('change', function() {
-            const file = this.files[0];
+        previewImg.addEventListener('load', sesuaikanRasioGambar);
+
+        // --- Fungsi Penanganan File Gambar ---
+        function tanganiUnggahGambar(file) {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -239,9 +273,17 @@ Guna Merubah mindset</textarea>
                 }
                 reader.readAsDataURL(file);
             }
+        }
+
+        uploadGaleri.addEventListener('change', function() {
+            tanganiUnggahGambar(this.files[0]);
         });
 
-        // --- Update teks berita (per baris) ---
+        uploadKamera.addEventListener('change', function() {
+            tanganiUnggahGambar(this.files[0]);
+        });
+
+        // --- Update Teks Berita ---
         inputBerita.addEventListener('input', function() {
             const baris = this.value.split('\n');
 
@@ -267,34 +309,33 @@ Guna Merubah mindset</textarea>
             }
         });
 
-        // --- Update sumber foto ---
+        // --- Update Sumber Foto ---
         inputFoto.addEventListener('input', function() {
             textFoto.textContent = this.value;
         });
 
-        // --- INISIALISASI AWAL: sinkronkan tampilan dengan nilai default ---
+        // --- Inisialisasi awal ---
         inputBerita.dispatchEvent(new Event('input'));
         inputFoto.dispatchEvent(new Event('input'));
+        if (previewImg.complete) {
+            sesuaikanRasioGambar();
+        }
 
-        // --- FITUR SIMPAN GAMBAR (dengan async/await) ---
+        // --- Fitur Simpan Gambar ---
         btnSimpan.addEventListener('click', async function() {
             try {
-                // Pastikan gambar sudah dimuat sepenuhnya
-                const img = previewImg;
-                if (!img.complete) {
-                    await new Promise((resolve) => img.onload = resolve);
+                if (!previewImg.complete) {
+                    await new Promise((resolve) => previewImg.onload = resolve);
                 }
 
-                // Ambil screenshot dengan opsi yang lebih baik
                 const canvas = await html2canvas(areaBerita, {
                     useCORS: true,
-                    scale: 2,           // kualitas lebih tinggi
+                    scale: 2,
                     allowTaint: false,
                     backgroundColor: null,
                     logging: false,
                 });
 
-                // Download otomatis
                 const link = document.createElement('a');
                 link.download = 'berita-media-sosial.png';
                 link.href = canvas.toDataURL('image/png');
@@ -305,22 +346,28 @@ Guna Merubah mindset</textarea>
             }
         });
 
-        // --- FITUR BAGIKAN (dengan async/await) ---
+        // --- Fitur Share / Bagikan ---
         btnShare.addEventListener('click', async function() {
             try {
-                const img = previewImg;
-                if (!img.complete) {
-                    await new Promise((resolve) => img.onload = resolve);
+                if (!previewImg.complete) {
+                    await new Promise((resolve) => previewImg.onload = resolve);
                 }
 
                 const canvas = await html2canvas(areaBerita, {
                     useCORS: true,
                     scale: 2,
                     allowTaint: false,
+                    logging: false
                 });
 
                 canvas.toBlob(blob => {
+                    if (!blob) {
+                        alert("Gagal membuat gambar untuk dibagikan.");
+                        return;
+                    }
+                    
                     const file = new File([blob], "berita.png", { type: "image/png" });
+                    
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         navigator.share({
                             files: [file],
@@ -328,9 +375,9 @@ Guna Merubah mindset</textarea>
                             text: textBaris1.textContent + " " + textBaris2.textContent
                         })
                         .then(() => console.log('Berhasil membagikan!'))
-                        .catch((error) => console.log('Gagal membagikan:', error));
+                        .catch((error) => console.log('Batal/Gagal membagikan:', error));
                     } else {
-                        alert("Browser Anda tidak mendukung fitur share langsung. Silakan gunakan tombol 'Simpan Gambar' terlebih dahulu, lalu unggah manual ke media sosial.");
+                        alert("Browser Anda tidak mendukung fitur berbagi file secara langsung. Silakan simpan gambar terlebih dahulu.");
                     }
                 }, 'image/png');
             } catch (err) {
