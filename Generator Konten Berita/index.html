@@ -4,18 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Konten Berita</title>
-    <!-- Meload html2canvas untuk konversi HTML ke Gambar -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-        <!-- Tambahkan tombol kembali -->
-    <script src="../tombol-kembali.js"></script>
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-DV25BYV3TL"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-DV25BYV3TL');
     </script>
+    <!-- Tambahkan tombol kembali -->
+    <script src="../tombol-kembali.js"></script>
+    
+    <!-- Meload html2canvas untuk konversi HTML ke Gambar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --primary-color: #3498db;
@@ -85,10 +84,28 @@
             border-color: var(--primary-color);
         }
 
-        .form-group input[type="file"] {
-            padding: 6px;
-            background-color: var(--light-bg);
+        /* Group Tombol Upload Galeri / Kamera */
+        .upload-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .upload-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1.5px dashed #3498db;
+            background-color: #ebf5fb;
+            color: #2980b9;
+            border-radius: 6px;
             cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            transition: background-color 0.2s ease;
+        }
+
+        .upload-btn:hover {
+            background-color: #d4e6f1;
         }
 
         .button-group {
@@ -141,7 +158,7 @@
             margin-bottom: 30px;
         }
 
-        /* Gaya Template Postingan (Tetap berukuran 500px untuk hasil export yang tajam) */
+        /* Gaya Template Postingan */
         .post-container {
             width: 500px;
             min-width: 500px;
@@ -154,14 +171,17 @@
         .image-container {
             position: relative;
             width: 100%;
-            height: 600px;
-            background-color: #111; /* Latar belakang gelap jika belum ada gambar */
+            height: auto; /* Disesuaikan otomatis berdasarkan rasio gambar */
+            background-color: #111;
+            display: flex;
+            align-items: center;
         }
 
         .image-container img {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: auto;
+            display: block;
+            object-fit: contain;
         }
 
         /* Label Viral */
@@ -200,7 +220,7 @@
         .main-title {
             font-size: 20px;
             font-weight: 800;
-            line-height: 1;
+            line-height: 1.2;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
@@ -220,29 +240,6 @@
             color: #f5f6fa;
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
             font-weight: 400;
-        }
-
-        /* Bagian Footer di dalam kartu post (Sumber Info) */
-        .post-footer {
-            padding: 14px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #ffffff;
-            border-top: 1px solid #f1f2f6;
-        }
-
-        .source-text {
-            color: var(--danger-color);
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-        }
-
-        .likes-count {
-            color: #7f8c8d;
-            font-size: 12px;
-            font-weight: 500;
         }
 
         /* Notifikasi Custom */
@@ -286,8 +283,17 @@
     <!-- PANEL KONTROL -->
     <div class="control-panel">
         <div class="form-group">
-            <label for="imageInput">1. Upload Gambar Latar</label>
-            <input type="file" id="imageInput" accept="image/*">
+            <label>1. Upload Gambar Latar</label>
+            <div class="upload-options">
+                <label class="upload-btn">
+                    📁 Dari Galeri
+                    <input type="file" id="imageInputGallery" accept="image/*" style="display: none;">
+                </label>
+                <label class="upload-btn">
+                    📷 Dari Kamera
+                    <input type="file" id="imageInputCamera" accept="image/*" capture="environment" style="display: none;">
+                </label>
+            </div>
         </div>
         <div class="form-group">
             <label for="titleInput1">2. Judul Baris 1 (Putih)</label>
@@ -330,15 +336,12 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Footer dengan sumber yang dinamis -->
-
         </div>
     </div>
     
     <div class="responsive-info">Geser pratinjau jika terpotong pada layar ponsel kecil</div>
 
-    <!-- NOTIFIKASI CUSTOM (PENGGANTI ALERT) -->
+    <!-- NOTIFIKASI CUSTOM -->
     <div id="toast" class="custom-toast">
         <span id="toastIcon">✨</span>
         <span id="toastMessage">Pesan berhasil ditampilkan!</span>
@@ -346,18 +349,17 @@
 
     <script>
         // Elemen Input Form
-        const imageInput = document.getElementById('imageInput');
+        const imageInputGallery = document.getElementById('imageInputGallery');
+        const imageInputCamera = document.getElementById('imageInputCamera');
         const titleInput1 = document.getElementById('titleInput1');
         const titleInput2 = document.getElementById('titleInput2');
         const descInput = document.getElementById('descInput');
-        const sourceInput = document.getElementById('sourceInput');
 
         // Elemen Pratinjau Desain Kartu
         const previewImg = document.getElementById('previewImg');
         const textTitle1 = document.getElementById('textTitle1');
         const textTitle2 = document.getElementById('textTitle2');
         const textDesc = document.getElementById('textDesc');
-        const textSource = document.getElementById('textSource');
 
         // Toast Notification System
         function showToast(message, icon = "✨") {
@@ -371,33 +373,25 @@
             }, 3000);
         }
 
-        // Live Preview: Update Gambar ketika pengguna mengunggah file baru
-        imageInput.addEventListener('change', function() {
-            const file = this.files[0];
+        // Fungsi Penanganan File Gambar (Galeri / Kamera)
+        function handleImageUpload(file) {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     previewImg.src = e.target.result;
-                    showToast("Gambar latar berhasil diunggah!", "📸");
-                    
-                    // MODIFIKASI: Menyesuaikan tinggi container berdasarkan rasio asli gambar
-                    previewImg.onload = function() {
-                        const imageContainer = document.querySelector('.image-container');
-                        const originalWidth = previewImg.naturalWidth;
-                        const originalHeight = previewImg.naturalHeight;
-                        
-                        // Hitung tinggi baru berdasarkan lebar container yang tetap (500px)
-                        const aspectRasio = originalHeight / originalWidth;
-                        const newHeight = 500 * aspectRasio;
-                        
-                        // Terapkan tinggi baru ke container gambar
-                        imageContainer.style.height = newHeight + 'px';
-                    };
+                    showToast("Gambar latar berhasil diperbarui!", "📸");
                 }
                 reader.readAsDataURL(file);
             }
+        }
+
+        imageInputGallery.addEventListener('change', function() {
+            handleImageUpload(this.files[0]);
         });
 
+        imageInputCamera.addEventListener('change', function() {
+            handleImageUpload(this.files[0]);
+        });
 
         // Live Preview: Update Teks Secara Realtime saat pengguna mengetik
         titleInput1.addEventListener('input', () => { 
@@ -405,7 +399,6 @@
         });
 
         titleInput2.addEventListener('input', () => { 
-            // Mengubah baris baru / newline menjadi elemen <br> agar rapi di pratinjau
             const cleanText = titleInput2.value.replace(/\n/g, '<br>');
             textTitle2.innerHTML = cleanText || "JUDUL BARIS 2"; 
         });
@@ -414,21 +407,15 @@
             textDesc.innerText = descInput.value || "Deskripsi rincian berita utama Anda di sini..."; 
         });
 
-        sourceInput.addEventListener('input', () => { 
-            const sourceVal = sourceInput.value.trim().toUpperCase();
-            textSource.innerText = sourceVal ? "SUMBER: " + sourceVal : "SUMBER: UMUM"; 
-        });
-
         // FUNGSI 1: Simpan Konten sebagai File Gambar PNG
         function saveAsImage() {
             const card = document.getElementById('postCard');
             showToast("Sedang memproses gambar...", "⏳");
             
-            // Menggunakan html2canvas untuk merender elemen div menjadi objek canvas gambar
             html2canvas(card, { 
                 useCORS: true,
                 allowTaint: true,
-                scale: 2 // Meningkatkan skala rendering agar hasil download tidak pecah / buram
+                scale: 2
             }).then(canvas => {
                 try {
                     const link = document.createElement('a');
@@ -446,36 +433,69 @@
             });
         }
 
-        // FUNGSI 2: Berbagi Konten (Mendukung Web Share API ponsel cerdas atau Salin Teks ke Clipboard)
-        function shareContent() {
-            const fullTitle = `${titleInput1.value} - ${titleInput2.value}`;
-            const shareText = `📰 *${fullTitle}*\n\n${descInput.value}\n\nSumber: ${sourceInput.value}`;
+        // FUNGSI 2: Berbagi Gambar Hasil Generator
+        async function shareContent() {
+            const card = document.getElementById('postCard');
+            showToast("Menyiapkan berkas berbagi...", "⏳");
 
-            if (navigator.share) {
-                navigator.share({
-                    title: fullTitle,
-                    text: descInput.value,
-                    url: window.location.href
-                }).then(() => {
-                    showToast("Berhasil dibagikan!", "🎉");
-                }).catch((error) => {
-                    console.log('Batal atau gagal membagikan:', error);
+            try {
+                const canvas = await html2canvas(card, {
+                    useCORS: true,
+                    allowTaint: true,
+                    scale: 2
                 });
-            } else {
-                // Clipboard Fallback jika Web Share API tidak didukung pada browser desktop
-                const tempTextArea = document.createElement('textarea');
-                tempTextArea.value = shareText;
-                document.body.appendChild(tempTextArea);
-                tempTextArea.select();
-                try {
-                    document.execCommand('copy');
-                    showToast("Teks berita berhasil disalin ke clipboard!", "📋");
-                } catch (err) {
-                    showToast("Gagal menyalin teks berita otomatis.", "❌");
-                }
-                document.body.removeChild(tempTextArea);
+
+                canvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        showToast("Gagal memproses gambar.", "❌");
+                        return;
+                    }
+
+                    const file = new File([blob], 'postingan-berita.png', { type: 'image/png' });
+                    const shareData = {
+                        title: titleInput1.value || "Berita Terbaru",
+                        text: `${titleInput1.value} - ${titleInput2.value}\n\n${descInput.value}`,
+                        files: [file]
+                    };
+
+                    // Periksa apakah browser mendukung fitur Web Share API untuk File
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share(shareData);
+                            showToast("Berhasil dibagikan!", "🎉");
+                        } catch (err) {
+                            if (err.name !== 'AbortError') {
+                                showToast("Batal atau gagal membagikan.", "ℹ️");
+                            }
+                        }
+                    } else if (navigator.share) {
+                        // Fallback: Share hanya Teks jika file sharing tidak didukung
+                        try {
+                            await navigator.share({
+                                title: shareData.title,
+                                text: shareData.text,
+                                url: window.location.href
+                            });
+                            showToast("Teks berhasil dibagikan!", "🎉");
+                        } catch (err) {
+                            console.log('Batal membagikan:', err);
+                        }
+                    } else {
+                        // Fallback untuk Browser Desktop yang tidak memiliki API Web Share
+                        try {
+                            await navigator.clipboard.writeText(`${shareData.text}`);
+                            showToast("Teks berita disalin ke clipboard!", "📋");
+                        } catch (err) {
+                            showToast("Fitur share tidak didukung di browser ini.", "❌");
+                        }
+                    }
+                }, 'image/png');
+
+            } catch (error) {
+                console.error("Share error:", error);
+                showToast("Terjadi kesalahan saat berbagi.", "❌");
             }
         }
     </script>
 </body>
-    </html>
+</html>
