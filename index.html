@@ -19,7 +19,7 @@
     <meta name="apple-mobile-web-app-title" content="Tools Lapangan">
     <link rel="manifest" href="manifest.json">
 
-    <!-- Tombol Install PWA (tetap) -->
+    <!-- Tombol Install PWA -->
     <script>
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -61,43 +61,36 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Background transparan agar canvas terlihat penuh */
-        body {
-            background: transparent !important;
-            position: relative;
-            margin: 0;
-            padding: 20px;
+        html, body {
+            background-color: #0a0a2a;
             min-height: 100vh;
+        }
+
+        body {
+            position: relative;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-        
-        html, body {
-            background-color: #0a0a2a;
-        }
 
-        /* Container utama dengan glassmorphism + efek neon lembut */
+        /* Optimization: GPU acceleration & CSS containment */
         .container {
             position: relative;
             z-index: 10;
             width: 100%;
             max-width: 560px;
             text-align: center;
-            background: rgba(15, 25, 45, 0.55);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            background: rgba(15, 25, 45, 0.75);
+            /* Ringan: backdrop-filter diturunkan agar scroll sangat mulus */
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             border-radius: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 30px 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        /* Efek glow pada container saat hover (kreatif) */
-        .container:hover {
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(120, 80, 200, 0.4);
-            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            will-change: transform; /* Memberi sinyal rendering ke GPU */
+            contain: content; /* Membatasi kalkulasi ulang layout saat scroll */
         }
 
         .profile-img {
@@ -107,11 +100,7 @@
             border: 3px solid #fff;
             margin-bottom: 12px;
             object-fit: cover;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease;
-        }
-        .profile-img:hover {
-            transform: scale(1.02);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         h1 {
@@ -124,16 +113,13 @@
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* Subjudul kreator (desain konteks kreator) */
         .creator-badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
             background: rgba(255, 215, 0, 0.2);
-            backdrop-filter: blur(4px);
             padding: 4px 12px;
             border-radius: 40px;
             font-size: 0.7rem;
@@ -141,9 +127,6 @@
             color: #FFE6A3;
             margin-bottom: 12px;
             border: 0.5px solid rgba(255,215,0,0.4);
-        }
-        .creator-badge span {
-            font-size: 0.85rem;
         }
 
         .tagline {
@@ -154,7 +137,6 @@
             letter-spacing: 0.2px;
         }
 
-        /* GRID 2 KOLOM — DI PERTAHANKAN DENGAN UKURAN TEKS YANG SUDAH DIOPTIMALKAN */
         .links-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -162,7 +144,7 @@
             margin-bottom: 8px;
         }
 
-        /* Link card dengan desain kreator modern */
+        /* Link card yang dioptimalkan */
         .link-card {
             display: flex;
             align-items: center;
@@ -175,39 +157,27 @@
             border-radius: 20px;
             font-weight: 600;
             font-size: 0.7rem;
-            transition: all 0.25s ease;
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
-            backdrop-filter: blur(2px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(255,255,255,0.6);
             word-break: break-word;
             line-height: 1.35;
             min-height: 58px;
+            transition: transform 0.15s ease, background-color 0.15s ease;
         }
 
-        /* Efek hover kreatif: gradien + shadow neon */
         .link-card:hover {
-            transform: translateY(-3px);
-            background: linear-gradient(135deg, #ffffff, #f5f0ff);
+            transform: translateY(-2px);
+            background: #f5f0ff;
             color: #5a3e9c;
-            box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(120, 80, 200, 0.5);
-            border-color: transparent;
         }
 
-        /* Ikon kecil pada link (opsional, menambah sentuhan kreator) */
         .link-card::before {
             content: "✨";
             font-size: 0.8rem;
             margin-right: 6px;
             opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        .link-card:hover::before {
-            opacity: 1;
-            transform: scale(1.05);
-            display: inline-block;
         }
 
-        /* Footer kreator */
         .footer {
             margin-top: 28px;
             font-size: 10px;
@@ -220,17 +190,17 @@
             gap: 12px;
             flex-wrap: wrap;
         }
+
         .footer .creator-name {
             font-weight: 600;
-            background: linear-gradient(120deg, #FFD966, #FFB347);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
+            color: #FFD966;
         }
+
         .footer .heart {
             color: #ff7b89;
             font-size: 11px;
         }
+
         .version {
             font-family: monospace;
             background: rgba(0,0,0,0.3);
@@ -239,7 +209,6 @@
             font-size: 9px;
         }
 
-        /* Responsive: Pastikan grid dan teks tetap pada layar kecil */
         @media (max-width: 480px) {
             .container {
                 max-width: 100%;
@@ -266,14 +235,12 @@
             }
         }
 
-        /* Canvas background (dipertahankan, tapi dengan efek partikel warna-warni) */
         #particle-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: block;
             pointer-events: none;
             z-index: 0;
         }
@@ -286,34 +253,24 @@
         <img src="https://avatars.githubusercontent.com/u/35713532?s=400&u=90c3d92e40688131f2460270ef4b637e6bba0b27&v=4" alt="Profile Picture" class="profile-img">
         
         <h1>Tools Digital kreator</h1>
-        <!-- badge kreator: konteks kreator ditonjolkan -->
         <div class="creator-badge">
             <span>🎨</span> Creator: Mhd Haza • Digital Innovation
         </div>
         <p class="tagline">Efektif • Efisien • Terintegrasi</p>
 
         <div class="links-container">
-            <!-- Daftar link (semua dipertahankan) -->
             <a href="Advanced Media Frame Overlay Studio/" class="link-card">Advanced-Media-Frame-Overlay-Studio</a>
-            <a href="Generator Angka/" class="link-card" >Generator</a>
+            <a href="Universal Font Fiesta PRO/" class="link-card">Fancy-Font-Fiesta-PRO</a>
             <a href="Generator Frame Berita Singkat/" class="link-card">Generator-Frame-Berita-Singkat</a>
             <a href="Generator Frame Berita Viral Otomatis/" class="link-card">Generator-Frame-Berita-Viral-Otomatis</a>
-            <a href="Generator Konten Berita/" class="link-card" >Generator Konten Berita</a>
+            <a href="Generator Konten Berita/" class="link-card">Generator Konten Berita</a>
             <a href="Generator Meme & Konten Gambar/" class="link-card">Generator-Meme-Konten-Gambar</a>
-            <a href="Konten Berita Generator Pro/" class="link-card" >Konten Berita Generator Pro</a>
-            <a href="Pattern Lock 4D/" class="link-card">pattern-pola-acak</a>
-            <a href="Poster Frame 9:16/" class="link-card" >Poster Frame 9:16</a>
+            <a href="Konten Berita Generator Pro/" class="link-card">Konten Berita Generator Pro</a>
+            <a href="vs code html editor/" class="link-card">code html editor</a>
+            <a href="Poster Frame 9:16/" class="link-card">Poster Frame 9:16</a>
             <a href="Quote & Photo Studio/" class="link-card">Quote-Photo-Studio-Preview-Download-Ultimate</a>
             <a href="Quote Editor & Creator/" class="link-card">Quote-Editor-Creator</a>
-            <a href="Teleprompter Pro V5" class="link-card" >Teleprompter-Pro-V5-Kamera-Rekam-Cermin</a>
-            <a href="Universal Font Fiesta PRO/" class="link-card">Fancy-Font-Fiesta-PRO</a>
-            <a href="vs code html editor/" class="link-card" >code html editor</a>
-            
-            
-            
-
-
-
+            <a href="Teleprompter Pro V5" class="link-card">Teleprompter-Pro-V5-Kamera-Rekam-Cermin</a>
         </div>
 
         <div class="footer">
@@ -323,176 +280,90 @@
         </div>
     </div>
 
-    <!-- ========== MODIFIKASI SCRIPT PARTICLE DENGAN NUANSA KREATOR ========== -->
+    <!-- ========== PARTICLE SCRIPT (ULTRA LIGHT & NO LAG) ========== -->
     <script>
         (function() {
-            // Canvas sebagai background dinamis - efek partikel "kreator" dengan warna-warni & bentuk bercahaya
-            let canvas = document.createElement('canvas');
+            const canvas = document.createElement('canvas');
             canvas.id = 'particle-canvas';
             document.body.insertBefore(canvas, document.body.firstChild);
-            let ctx = canvas.getContext('2d');
-            
+            const ctx = canvas.getContext('2d', { alpha: false }); // Mematikan alpha background berlebihan
+
             let particlesArray = [];
-            let hueShift = 0;
-            let mouse = { x: undefined, y: undefined };
-            
-            // Resize canvas fullscreen
+            const maxParticles = 35; // Dibatasi agar RAM & CPU hemat
+            let isTicking = false;
+
             function resizeCanvas() {
-                const w = window.innerWidth;
-                const h = window.innerHeight;
-                canvas.width = w;
-                canvas.height = h;
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
             }
-            window.addEventListener('resize', () => { resizeCanvas(); });
+            window.addEventListener('resize', resizeCanvas, { passive: true });
             resizeCanvas();
-            
-            // Kelas partikel ditingkatkan dengan efek lebih kreatif (glow, ukuran variatif)
-            class CreativeParticle {
+
+            class UltraLightParticle {
                 constructor(x, y) {
                     this.x = x;
                     this.y = y;
-                    // Ukuran lebih bervariasi (2 - 12px) agar lebih artistik
-                    this.size = Math.random() * 8 + 3;
-                    this.speedX = (Math.random() - 0.5) * 2.2;
-                    this.speedY = (Math.random() - 0.5) * 2.2;
-                    this.opacity = 0.9 + Math.random() * 0.3;
-                    this.hue = (hueShift + Math.random() * 60) % 360;
-                    this.shrink = 0.96 + Math.random() * 0.03; // fade gradual
+                    this.size = Math.random() * 2.5 + 1;
+                    this.speedX = (Math.random() - 0.5) * 1.2;
+                    this.speedY = (Math.random() - 0.5) * 1.2;
+                    this.opacity = 0.8;
                 }
-                
+
                 draw() {
-                    ctx.save();
-                    ctx.globalAlpha = this.opacity;
-                    ctx.shadowBlur = 8;
-                    ctx.shadowColor = `hsl(${this.hue}, 100%, 65%)`;
                     ctx.beginPath();
-                    ctx.fillStyle = `hsl(${this.hue}, 85%, 65%)`;
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(180, 200, 255, ${this.opacity})`;
                     ctx.fill();
-                    // Tambahan efek bintang kecil (optional untuk kreator)
-                    if (this.size > 5) {
-                        ctx.beginPath();
-                        ctx.fillStyle = `rgba(255, 220, 150, 0.7)`;
-                        ctx.arc(this.x - 1, this.y - 1, this.size * 0.25, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                    ctx.restore();
                 }
-                
+
                 update() {
                     this.x += this.speedX;
                     this.y += this.speedY;
-                    this.opacity -= 0.018;
-                    this.size *= this.shrink;
-                    if (this.opacity <= 0.02 || this.size <= 0.3) {
-                        this.opacity = 0;
+                    this.opacity -= 0.025; // Cepat hilang agar memori bersih
+                }
+            }
+
+            // Throttled Add Particles untuk menghemat performa kursor
+            function spawn(x, y, count = 1) {
+                if (particlesArray.length < maxParticles) {
+                    for (let i = 0; i < count; i++) {
+                        particlesArray.push(new UltraLightParticle(x, y));
                     }
                 }
             }
-            
-            // Spawn partikel dengan jumlah lebih banyak dan efek meriah (kreatif)
-            function spawnCreativeParticles(count = 6) {
-                if (mouse.x === undefined || mouse.y === undefined) return;
-                for (let i = 0; i < count; i++) {
-                    // sedikit offset untuk menciptakan percikan
-                    let offX = (Math.random() - 0.5) * 12;
-                    let offY = (Math.random() - 0.5) * 12;
-                    particlesArray.push(new CreativeParticle(mouse.x + offX, mouse.y + offY));
-                }
-                if (particlesArray.length > 2200) {
-                    particlesArray = particlesArray.slice(-1800);
-                }
-            }
-            
-            // Event listener untuk mouse & touch (interaksi kreator)
+
+            // Event listener passive agar scroll tidak pernah terhambat
             window.addEventListener('mousemove', (e) => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-                spawnCreativeParticles(4);
-            });
-            
-            window.addEventListener('mousedown', (e) => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-                spawnCreativeParticles(12); // ledakan klik
-            });
-            
-            window.addEventListener('touchstart', (e) => {
-                if (e.touches.length) {
-                    mouse.x = e.touches[0].clientX;
-                    mouse.y = e.touches[0].clientY;
-                    spawnCreativeParticles(10);
+                if (!isTicking) {
+                    requestAnimationFrame(() => {
+                        spawn(e.clientX, e.clientY, 1);
+                        isTicking = false;
+                    });
+                    isTicking = true;
                 }
-            });
-            
-            window.addEventListener('touchmove', (e) => {
-                if (e.touches.length) {
-                    mouse.x = e.touches[0].clientX;
-                    mouse.y = e.touches[0].clientY;
-                    spawnCreativeParticles(5);
-                }
-            });
-            
-            window.addEventListener('mouseleave', () => {
-                mouse.x = undefined;
-                mouse.y = undefined;
-            });
-            
-            // Animasi dengan efek trail lebih artistik dan gradien background dinamis
-            let bgHue = 0;
+            }, { passive: true });
+
+            window.addEventListener('click', (e) => spawn(e.clientX, e.clientY, 5), { passive: true });
+
             function animate() {
-                // Efek tail yang lebih halus dengan transparansi variatif
-                ctx.fillStyle = 'rgba(5, 8, 25, 0.22)';
+                // Pembersihan canvas tercepat (bebas komputasi warna blended)
+                ctx.fillStyle = '#0a0a2a';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // update hue global untuk warna partikel berputar
-                hueShift = (hueShift + 0.8) % 360;
-                bgHue = (bgHue + 0.3) % 360;
-                
-                // sedikit gradien dinamis di background (sentuhan kreatif tanpa mengganggu)
-                let grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-                grad.addColorStop(0, `hsla(${bgHue}, 60%, 8%, 0.2)`);
-                grad.addColorStop(1, `hsla(${(bgHue + 40) % 360}, 65%, 12%, 0.25)`);
-                ctx.fillStyle = grad;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // gambar dan update semua partikel
+
                 for (let i = 0; i < particlesArray.length; i++) {
                     particlesArray[i].draw();
                     particlesArray[i].update();
+
+                    if (particlesArray[i].opacity <= 0) {
+                        particlesArray.splice(i, 1);
+                        i--;
+                    }
                 }
-                particlesArray = particlesArray.filter(p => p.opacity > 0.02);
                 requestAnimationFrame(animate);
             }
-            
+
             animate();
-            
-            // Efek sambutan: hujan partikel awal di tengah layar
-            setTimeout(() => {
-                if (window.innerWidth && window.innerHeight) {
-                    mouse.x = window.innerWidth / 2;
-                    mouse.y = window.innerHeight / 2;
-                    for(let i = 0; i < 55; i++) spawnCreativeParticles(1);
-                }
-            }, 150);
-            
-            // tambahan efek klik pada link card (pengalaman kreator)
-            const allLinks = document.querySelectorAll('.link-card');
-            allLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    if (mouse.x && mouse.y) {
-                        for (let i = 0; i < 8; i++) {
-                            let burst = new CreativeParticle(mouse.x + (Math.random() - 0.5) * 20, mouse.y + (Math.random() - 0.5) * 20);
-                            burst.size = Math.random() * 6 + 2;
-                            burst.speedX = (Math.random() - 0.5) * 3;
-                            burst.speedY = (Math.random() - 0.5) * 3;
-                            particlesArray.push(burst);
-                        }
-                    }
-                });
-            });
         })();
     </script>
-    <!-- tambahan gaya interaktif untuk menjaga aksesibilitas dan tetap mempertahankan grid & teks -->
 </body>
 </html>
