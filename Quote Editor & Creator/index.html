@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quote Editor & Creator</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Inter:wght@400;600;800&family=Cinzel:wght@700&family=Alex+Brush&family=Bebas+Neue&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
-    </script>
-        <!-- Tambahkan tombol kembali -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Tambahkan tombol kembali -->
     <script src="../tombol-kembali.js"></script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DV25BYV3TL"></script>
@@ -40,11 +38,12 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-        #preview-container {
-            aspect-ratio: 4 / 5;
-            max-height: 65vh;
+        #preview-wrapper {
+            max-height: 70vh;
+            max-width: 100%;
+            width: auto;
+            height: auto;
         }
-        /* Untuk animasi fade in */
         .animate-fadeIn {
             animation: fadeIn 0.2s ease-in-out;
         }
@@ -74,39 +73,50 @@
                     <p class="text-xs text-slate-400">Buat, kustomisasi, dan bagikan kutipan indah Anda</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                <label class="cursor-pointer bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 text-sm shadow-md border border-slate-600 flex-1 sm:flex-none">
+            
+            <!-- Upload Menu Dropdown (Galeri & Kamera) -->
+            <div class="relative w-full sm:w-auto flex justify-end">
+                <button id="upload-menu-btn" class="bg-slate-700 hover:bg-slate-600 text-white font-medium py-2 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-2 text-sm shadow-md border border-slate-600 w-full sm:w-auto">
                     <i class="fa-solid fa-upload"></i>
                     <span>Unggah Background</span>
-                    <input type="file" id="upload-bg-input" accept="image/*" class="hidden" />
-                </label>
+                    <i class="fa-solid fa-chevron-down text-xs ml-1"></i>
+                </button>
+                
+                <div id="upload-dropdown" class="hidden absolute right-0 top-12 w-48 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 p-2 flex flex-col gap-1">
+                    <label class="cursor-pointer hover:bg-slate-700 p-2 rounded-lg text-xs flex items-center gap-2 text-slate-200">
+                        <i class="fa-solid fa-images text-indigo-400"></i>
+                        <span>Pilih dari Galeri</span>
+                        <input type="file" id="upload-bg-gallery" accept="image/*" class="hidden" />
+                    </label>
+                    <label class="cursor-pointer hover:bg-slate-700 p-2 rounded-lg text-xs flex items-center gap-2 text-slate-200">
+                        <i class="fa-solid fa-camera text-pink-400"></i>
+                        <span>Ambil dari Kamera</span>
+                        <input type="file" id="upload-bg-camera" accept="image/*" capture="environment" class="hidden" />
+                    </label>
+                </div>
             </div>
         </div>
     </header>
 
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        <!-- Tab Navigation & Canvas (7 kolom) -->
+        <!-- Canvas Preview Section (7 Kolom) -->
         <div class="lg:col-span-7 flex flex-col gap-4">
-
-            <!-- Tab Buttons -->
-            <div class="bg-slate-800 p-3 rounded-2xl border border-slate-700 shadow-xl">
-                <div class="flex items-center justify-between mb-2 px-1">
-                    <span class="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Pilih Template Gambar</span>
-                    <span id="tab-indicator" class="text-xs text-slate-400 font-medium">Gambar 1 dari 10</span>
-                </div>
-                <div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar snap-x" id="tabs-container">
-                    <!-- Tabs akan di-generate oleh JS -->
-                </div>
+            
+            <!-- Selector Template Dropdown (Pengganti Tab Bar) -->
+            <div class="bg-slate-800 p-3 rounded-2xl border border-slate-700 shadow-xl flex flex-col gap-2">
+                <label class="text-xs font-semibold text-indigo-400 uppercase tracking-wider px-1">Pilih Template Gambar</label>
+                <select id="template-dropdown" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <!-- Options akan di-generate oleh JS -->
+                </select>
             </div>
 
-            <!-- Canvas Preview -->
-            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl p-4 flex flex-col items-center justify-center relative group">
+            <!-- Area Canvas Preview -->
+            <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-2xl p-4 flex flex-col items-center justify-center relative group min-h-[400px]">
+                <div id="preview-wrapper" class="relative overflow-hidden rounded-xl shadow-lg border border-slate-700 bg-black flex items-center justify-center">
 
-                <div id="preview-wrapper" class="relative overflow-hidden rounded-xl shadow-lg border border-slate-700 w-full max-w-md bg-black flex items-center justify-center">
-
-                    <!-- Background Image -->
-                    <img id="bg-image-preview" src="1000305577.jpg" alt="Background" class="w-full h-full object-cover select-none pointer-events-none transition-all duration-300" />
+                    <!-- Background Image Preview -->
+                    <img id="bg-image-preview" src="1000305577.jpg" alt="Background Preview" class="max-w-full max-h-[65vh] w-full h-auto object-cover select-none pointer-events-none transition-all duration-300 block" />
 
                     <!-- Overlay -->
                     <div id="overlay" class="absolute inset-0 bg-black/30 pointer-events-none transition-all duration-200"></div>
@@ -119,18 +129,16 @@
                         </div>
                     </div>
 
-                    <!-- Watermark -->
-                    <div class="absolute bottom-3 right-3 text-[10px] text-white/50 font-mono tracking-widest pointer-events-none uppercase">...</div>
                 </div>
 
                 <p class="text-xs text-slate-400 mt-3 text-center flex items-center gap-1.5">
                     <i class="fa-solid fa-circle-info text-indigo-400"></i>
-                    <span>Gunakan panel kanan untuk menyesuaikan isi teks, jenis tulisan, ukuran, warna, dan posisi (seret teks untuk mengubah posisi).</span>
+                    <span>Gunakan panel kanan untuk menyesuaikan isi teks, font, warna, dan posisi (geser teks pada preview untuk memindahkan).</span>
                 </p>
             </div>
         </div>
 
-        <!-- Customization Controls (5 kolom) -->
+        <!-- Customization Controls (5 Kolom) -->
         <div class="lg:col-span-5 flex flex-col gap-6">
 
             <div class="bg-slate-800 rounded-2xl border border-slate-700 shadow-xl p-5 flex flex-col gap-5">
@@ -167,35 +175,17 @@
                 <div class="space-y-4">
                     <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-700 pb-1.5">Tipografi & Gaya</h3>
 
-                    <!-- Font Selector -->
+                    <!-- Font Selector Dropdown -->
                     <div>
                         <label class="block text-xs text-slate-300 mb-1.5">Pilih Font</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Playfair Display">
-                                <span class="font-[Playfair Display]">Elegant Serif</span>
-                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
-                            </button>
-                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Caveat">
-                                <span class="font-[Caveat] text-sm">Handwritten</span>
-                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
-                            </button>
-                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Montserrat">
-                                <span class="font-[Montserrat]">Montserrat</span>
-                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
-                            </button>
-                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Bebas Neue">
-                                <span class="font-[Bebas Neue] tracking-wide">Bebas Neue</span>
-                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
-                            </button>
-                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Alex Brush">
-                                <span class="font-[Alex Brush] text-sm">Romance</span>
-                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
-                            </button>
-                            <button class="font-option py-2 px-2 text-xs border rounded-lg bg-slate-900/40 text-left hover:bg-slate-700 transition duration-150 flex items-center justify-between" data-font="Inter">
-                                <span class="font-[Inter]">Modern Clean</span>
-                                <i class="fa-solid fa-check text-indigo-500 text-[10px] opacity-0"></i>
-                            </button>
-                        </div>
+                        <select id="font-family-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="Playfair Display">Elegant Serif (Playfair Display)</option>
+                            <option value="Caveat">Handwritten (Caveat)</option>
+                            <option value="Montserrat">Montserrat</option>
+                            <option value="Bebas Neue">Bebas Neue</option>
+                            <option value="Alex Brush">Romance (Alex Brush)</option>
+                            <option value="Inter">Modern Clean (Inter)</option>
+                        </select>
                     </div>
 
                     <!-- Size & Weight -->
@@ -299,6 +289,13 @@
                             <span class="text-[9px] text-slate-300">Lainnya</span>
                         </button>
                     </div>
+                    
+                    <!-- Directly Share Generated Image File Button -->
+                    <button id="share-image-btn" class="w-full mb-3 bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-500 hover:to-rose-400 text-white font-semibold py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-image"></i>
+                        <span>Bagikan File Gambar Secara Langsung</span>
+                    </button>
+
                     <div class="flex items-center gap-2 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
                         <input id="share-link-input" type="text" readonly value="https://quotes-generator.app" class="bg-transparent border-none text-[11px] text-slate-400 w-full focus:outline-none px-2 select-all" />
                         <button id="copy-link-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold py-1 px-3 rounded transition-all whitespace-nowrap">
@@ -481,14 +478,17 @@
         let activeTextGroup = 'primary';
         let templateData = JSON.parse(JSON.stringify(defaultTemplates));
 
-        // DOM elements
-        const tabsContainer = document.getElementById('tabs-container');
+        // DOM Elements Canvas & Preview
+        const previewWrapper = document.getElementById('preview-wrapper');
         const bgImagePreview = document.getElementById('bg-image-preview');
         const overlay = document.getElementById('overlay');
         const textLayer = document.getElementById('text-layer');
         const quoteTextPrimary = document.getElementById('quote-text-primary');
         const quoteTextSecondary = document.getElementById('quote-text-secondary');
-        const tabIndicator = document.getElementById('tab-indicator');
+
+        // DOM Elements Controls
+        const templateDropdown = document.getElementById('template-dropdown');
+        const fontFamilySelect = document.getElementById('font-family-select');
 
         const textInputPrimary = document.getElementById('text-input-primary');
         const textInputSecondary = document.getElementById('text-input-secondary');
@@ -500,7 +500,12 @@
         const overlaySlider = document.getElementById('overlay-slider');
         const overlayVal = document.getElementById('overlay-val');
         const shadowSelect = document.getElementById('shadow-select');
-        const uploadBgInput = document.getElementById('upload-bg-input');
+
+        // Menu Dropdown Upload
+        const uploadMenuBtn = document.getElementById('upload-menu-btn');
+        const uploadDropdown = document.getElementById('upload-dropdown');
+        const uploadBgGallery = document.getElementById('upload-bg-gallery');
+        const uploadBgCamera = document.getElementById('upload-bg-camera');
 
         const btnTabText1 = document.getElementById('btn-tab-text1');
         const btnTabText2 = document.getElementById('btn-tab-text2');
@@ -511,6 +516,7 @@
         const sharePanel = document.getElementById('share-panel');
         const closeShare = document.getElementById('close-share');
         const copyLinkBtn = document.getElementById('copy-link-btn');
+        const shareImageBtn = document.getElementById('share-image-btn');
 
         const toast = document.getElementById('toast');
         const toastTitle = document.getElementById('toast-title');
@@ -533,66 +539,53 @@
             }, 3000);
         }
 
-        // ========== TAB SYSTEM ==========
-        function initTabs() {
-            tabsContainer.innerHTML = '';
+        // ========== INIT DROPDOWN ==========
+        function initDropdown() {
+            templateDropdown.innerHTML = '';
             templateData.forEach((temp, idx) => {
-                const tabButton = document.createElement('button');
-                tabButton.className =
-                    `snap-start flex-shrink-0 flex items-center gap-2 border px-3 py-2 rounded-xl text-xs font-semibold transition duration-150 ${idx === currentTemplateIdx ? 'bg-indigo-600 border-indigo-500 text-white shadow-md' : 'bg-slate-900/60 border-slate-700 text-slate-400 hover:text-slate-200'}`;
-                tabButton.innerHTML = `
-                    <div class="w-6 h-6 rounded bg-slate-800 border border-slate-700 overflow-hidden flex items-center justify-center text-[10px]">
-                        ${idx + 1}
-                    </div>
-                    <span class="whitespace-nowrap">${temp.title}</span>
-                `;
-                tabButton.addEventListener('click', () => {
-                    saveCurrentState();
-                    currentTemplateIdx = idx;
-                    renderTemplate(currentTemplateIdx);
-                    updateTabStyles();
-                });
-                tabsContainer.appendChild(tabButton);
+                const option = document.createElement('option');
+                option.value = idx;
+                option.innerText = `${idx + 1}. ${temp.title}`;
+                templateDropdown.appendChild(option);
             });
-            updateTabIndicator();
         }
 
-        function updateTabStyles() {
-            const tabs = tabsContainer.querySelectorAll('button');
-            tabs.forEach((tab, idx) => {
-                if (idx === currentTemplateIdx) {
-                    tab.className =
-                        `snap-start flex-shrink-0 flex items-center gap-2 border px-3 py-2 rounded-xl text-xs font-semibold transition duration-150 bg-indigo-600 border-indigo-500 text-white shadow-md`;
-                } else {
-                    tab.className =
-                        `snap-start flex-shrink-0 flex items-center gap-2 border px-3 py-2 rounded-xl text-xs font-semibold transition duration-150 bg-slate-900/60 border-slate-700 text-slate-400 hover:text-slate-200`;
-                }
-            });
-            updateTabIndicator();
+        function selectTemplate(idx) {
+            saveCurrentState();
+            currentTemplateIdx = idx;
+            templateDropdown.value = idx;
+            renderTemplate(currentTemplateIdx);
         }
 
-        function updateTabIndicator() {
-            tabIndicator.innerText = `Gambar ${currentTemplateIdx + 1} dari ${templateData.length}`;
-        }
+        templateDropdown.addEventListener('change', (e) => {
+            selectTemplate(parseInt(e.target.value));
+        });
 
         // ========== SAVE CURRENT STATE ==========
         function saveCurrentState() {
             const current = templateData[currentTemplateIdx];
             current.primaryText = textInputPrimary.value;
             current.secondaryText = textInputSecondary.value;
+            current.fontFamily = fontFamilySelect.value;
             current.fontSize = parseInt(fontSizeSlider.value);
             current.fontWeight = fontWeightSelect.value;
             current.color = textColorInput.value;
             current.overlay = parseInt(overlaySlider.value);
             current.shadow = shadowSelect.value;
-            // alignment diupdate langsung via event listener align
         }
 
         // ========== RENDER TEMPLATE ==========
         function renderTemplate(idx) {
             const temp = templateData[idx];
 
-            // Background image
+            // Render gambar background preview
+            bgImagePreview.onload = function() {
+                if (bgImagePreview.naturalWidth && bgImagePreview.naturalHeight) {
+                    const ratio = bgImagePreview.naturalWidth / bgImagePreview.naturalHeight;
+                    previewWrapper.style.aspectRatio = `${ratio}`;
+                }
+            };
+
             bgImagePreview.src = temp.fileName;
             bgImagePreview.onerror = function() {
                 const colors = [
@@ -608,14 +601,16 @@
                     "linear-gradient(135deg, #e6e9f0 0%, #eef1f5 100%)"
                 ];
                 bgImagePreview.style.display = 'none';
-                bgImagePreview.parentElement.style.background = colors[idx % colors.length];
+                previewWrapper.style.aspectRatio = '1 / 1';
+                previewWrapper.style.background = colors[idx % colors.length];
             };
             bgImagePreview.style.display = 'block';
-            bgImagePreview.parentElement.style.background = '';
+            previewWrapper.style.background = '';
 
             // Set form values
             textInputPrimary.value = temp.primaryText;
             textInputSecondary.value = temp.secondaryText;
+            fontFamilySelect.value = temp.fontFamily;
             fontSizeSlider.value = temp.fontSize;
             fontSizeVal.innerText = temp.fontSize + 'px';
             fontWeightSelect.value = temp.fontWeight;
@@ -626,16 +621,16 @@
             overlayVal.innerText = temp.overlay + '%';
             shadowSelect.value = temp.shadow;
 
-            // Set posisi teks dari data
+            // Set posisi teks pada canvas
             textLayer.style.left = temp.posX + '%';
             textLayer.style.top = temp.posY + '%';
             textLayer.style.transform = 'translate(-50%, -50%)';
 
-            // Render canvas
+            // Update Tampilan Canvas Preview
             updateCanvasElements();
         }
 
-        // ========== UPDATE CANVAS (tanpa mengubah posisi) ==========
+        // ========== UPDATE CANVAS ELEMENTS ==========
         function updateCanvasElements() {
             const temp = templateData[currentTemplateIdx];
 
@@ -643,10 +638,9 @@
             quoteTextSecondary.innerText = textInputSecondary.value;
 
             // Font
-            const activeFont = temp.fontFamily;
+            const activeFont = fontFamilySelect.value;
             quoteTextPrimary.style.fontFamily = activeFont;
-            quoteTextSecondary.style.fontFamily = (activeFont === 'Caveat' || activeFont === 'Alex Brush') ? 'Montserrat' :
-                activeFont;
+            quoteTextSecondary.style.fontFamily = (activeFont === 'Caveat' || activeFont === 'Alex Brush') ? 'Montserrat' : activeFont;
 
             quoteTextPrimary.style.fontSize = fontSizeSlider.value + 'px';
             quoteTextSecondary.style.fontSize = Math.max(12, parseInt(fontSizeSlider.value) * 0.6) + 'px';
@@ -674,20 +668,6 @@
             overlay.style.backgroundColor = `rgba(0, 0, 0, ${overlaySlider.value / 100})`;
             overlayVal.innerText = overlaySlider.value + '%';
 
-            // Font option checkmark
-            document.querySelectorAll('.font-option').forEach(btn => {
-                const checkIcon = btn.querySelector('i');
-                if (btn.getAttribute('data-font') === temp.fontFamily) {
-                    btn.classList.add('border-indigo-500', 'bg-indigo-600/10');
-                    checkIcon.classList.remove('opacity-0');
-                    checkIcon.classList.add('opacity-100');
-                } else {
-                    btn.classList.remove('border-indigo-500', 'bg-indigo-600/10');
-                    checkIcon.classList.add('opacity-0');
-                    checkIcon.classList.remove('opacity-100');
-                }
-            });
-
             // Shadow
             let shadowStyle = '';
             if (shadowSelect.value === 'soft') {
@@ -704,13 +684,17 @@
             quoteTextSecondary.style.textShadow = shadowStyle;
         }
 
-        // ========== EVENT LISTENERS ==========
+        // ========== EVENT LISTENERS CONTROLS ==========
         textInputPrimary.addEventListener('input', () => {
             templateData[currentTemplateIdx].primaryText = textInputPrimary.value;
             updateCanvasElements();
         });
         textInputSecondary.addEventListener('input', () => {
             templateData[currentTemplateIdx].secondaryText = textInputSecondary.value;
+            updateCanvasElements();
+        });
+        fontFamilySelect.addEventListener('change', () => {
+            templateData[currentTemplateIdx].fontFamily = fontFamilySelect.value;
             updateCanvasElements();
         });
         fontSizeSlider.addEventListener('input', () => {
@@ -745,30 +729,65 @@
             });
         });
 
-        // Font option
-        document.querySelectorAll('.font-option').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const font = btn.getAttribute('data-font');
-                templateData[currentTemplateIdx].fontFamily = font;
-                updateCanvasElements();
-            });
+        // Upload Dropdown Logic
+        uploadMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            uploadDropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', () => {
+            uploadDropdown.classList.add('hidden');
         });
 
-        // Upload background
-        uploadBgInput.addEventListener('change', (e) => {
+        // Helper untuk Kompresi Gambar
+        function compressAndResizeImage(file, maxDimension, quality, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxDimension || height > maxDimension) {
+                        if (width > height) {
+                            height = Math.round((height * maxDimension) / width);
+                            width = maxDimension;
+                        } else {
+                            width = Math.round((width * maxDimension) / height);
+                            height = maxDimension;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                    callback(compressedBase64);
+                };
+            };
+        }
+
+        // Handle Image Upload (Kamera & Galeri) + Auto-Compress
+        function handleImageUpload(e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    templateData[currentTemplateIdx].fileName = event.target.result;
-                    bgImagePreview.style.display = 'block';
-                    bgImagePreview.parentElement.style.background = '';
+                // Kompresi ke max dimensi 1200px dengan kualitas 80% (0.8)
+                compressAndResizeImage(file, 1200, 0.8, function(compressedDataUrl) {
+                    templateData[currentTemplateIdx].fileName = compressedDataUrl;
                     renderTemplate(currentTemplateIdx);
-                    showToast("Latar belakang Diganti", "Gambar Anda berhasil diunggah dan terpasang!");
-                };
-                reader.readAsDataURL(file);
+                    showToast("Latar Belakang Diganti", "Gambar dikompres & berhasil diunggah!");
+                });
             }
-        });
+            uploadDropdown.classList.add('hidden');
+            e.target.value = ''; // Reset file input
+        }
+
+        uploadBgGallery.addEventListener('change', handleImageUpload);
+        uploadBgCamera.addEventListener('change', handleImageUpload);
 
         // Editor tabs (Text 1 / Text 2)
         btnTabText1.addEventListener('click', () => {
@@ -810,7 +829,7 @@
 
                     downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> <span>Unduh Hasil</span>`;
                     downloadBtn.disabled = false;
-                    showToast("Unduhan Sukses!", "Gambar beresolusi tinggi berhasil disimpan ke perangkat Anda.");
+                    showToast("Unduhan Sukses!", "Gambar beresolusi tinggi berhasil disimpan.");
                 }).catch(err => {
                     console.error("Gagal merender gambar:", err);
                     downloadBtn.innerHTML = `<i class="fa-solid fa-download"></i> <span>Unduh Hasil</span>`;
@@ -828,7 +847,7 @@
             sharePanel.classList.add('hidden');
         });
 
-        // ========== SHARE BUTTONS (dipasang sekali) ==========
+        // ========== SHARE BUTTONS ==========
         document.getElementById('share-wa').addEventListener('click', () => {
             const text = encodeURIComponent(`"${templateData[currentTemplateIdx].primaryText}" - Dibuat dengan Quote Designer Studio`);
             const url = encodeURIComponent(window.location.href);
@@ -860,6 +879,42 @@
             }
         });
 
+        // ========== BAGIKAN FILE GAMBAR SECA RA LANGSUNG ==========
+        shareImageBtn.addEventListener('click', async () => {
+            shareImageBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>Memproses Gambar...</span>`;
+            shareImageBtn.disabled = true;
+
+            const container = document.getElementById('preview-wrapper');
+            try {
+                const canvas = await html2canvas(container, { allowTaint: true, useCORS: true, scale: 2 });
+                canvas.toBlob(async (blob) => {
+                    const file = new File([blob], `Quote_${Date.now()}.png`, { type: 'image/png' });
+                    
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        try {
+                            await navigator.share({
+                                files: [file],
+                                title: 'Hasil Kutipan Saya',
+                                text: 'Lihat kutipan yang baru saja saya buat!'
+                            });
+                            showToast("Berhasil Dibagikan!", "Gambar berhasil dibagikan.");
+                        } catch (e) {
+                            console.log("Dibatalkan:", e);
+                        }
+                    } else {
+                        showToast("Perangkat Tidak Mendukung", "Fitur share gambar langsung tidak didukung browser ini.", false);
+                    }
+                    shareImageBtn.innerHTML = `<i class="fa-solid fa-image"></i> <span>Bagikan File Gambar Secara Langsung</span>`;
+                    shareImageBtn.disabled = false;
+                }, 'image/png');
+            } catch (err) {
+                console.error(err);
+                shareImageBtn.innerHTML = `<i class="fa-solid fa-image"></i> <span>Bagikan File Gambar Secara Langsung</span>`;
+                shareImageBtn.disabled = false;
+                showToast("Gagal Memproses", "Gagal memproses gambar untuk dibagikan.", false);
+            }
+        });
+
         // ========== COPY LINK ==========
         function copyToClipboard() {
             const input = document.getElementById('share-link-input');
@@ -882,19 +937,14 @@
         }
         copyLinkBtn.addEventListener('click', copyToClipboard);
 
-        // ========== DRAG TEXT (diperbaiki) ==========
+        // ========== DRAG TEXT ==========
         let isDragging = false;
-        let dragStartX = 0,
-            dragStartY = 0;
-        let startPosX = 50,
-            startPosY = 50;
+        let dragStartX = 0, dragStartY = 0;
+        let startPosX = 50, startPosY = 50;
 
         function startDrag(e) {
             const touch = e.touches ? e.touches[0] : e;
-            const parent = document.getElementById('preview-wrapper');
-            const parentRect = parent.getBoundingClientRect();
 
-            // Ambil posisi persen saat ini dari style
             const left = parseFloat(textLayer.style.left) || 50;
             const top = parseFloat(textLayer.style.top) || 50;
             startPosX = left;
@@ -919,7 +969,6 @@
             let newX = startPosX + (deltaX / parentRect.width) * 100;
             let newY = startPosY + (deltaY / parentRect.height) * 100;
 
-            // Batasi agar tidak keluar area (0-100%)
             newX = Math.min(100, Math.max(0, newX));
             newY = Math.min(100, Math.max(0, newY));
 
@@ -948,9 +997,9 @@
 
         // ========== INIT ==========
         window.onload = function() {
-            initTabs();
+            initDropdown();
             renderTemplate(currentTemplateIdx);
         };
     </script>
 </body>
-                                </html>
+</html>
