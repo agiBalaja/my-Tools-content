@@ -1,7 +1,7 @@
 const CACHE_NAME = 'content-tools';
 const urlsToCache = [
-  '/2026-My-Tools/',
-  '/2026-My-Tools/index.html',
+  '/my-Tools-content/',
+  '/my-Tools-content/index.html',
   // Tambahkan file lain yang diperlukan (CSS, JS, gambar)
 ];
 
