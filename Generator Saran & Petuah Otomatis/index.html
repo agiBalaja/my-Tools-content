@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Saran & Petuah Otomatis</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 750px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .quote-mark {
+      font-size: 3rem;
+      color: #38bdf8;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    /* Container 2 Kolom untuk Bahasa Indonesia & Inggris */
+    .quote-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 25px;
+      text-align: left;
+    }
+
+    @media (max-width: 600px) {
+      .quote-grid {
+        grid-template-columns: 1fr; /* Tampilan tumpuk di HP */
+      }
+    }
+
+    .quote-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .lang-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #38bdf8;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .quote-text {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      font-style: italic;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      transition: opacity 0.3s ease;
+    }
+
+    .quote-author {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #38bdf8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
+    /* Styling Tombol Generate Manual */
+    .btn-generate {
+      margin-top: 15px;
+      background-color: #38bdf8;
+      color: #0f172a;
+      border: none;
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-generate:hover {
+      background-color: #0284c7;
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .btn-generate:active {
+      transform: translateY(0);
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .timer-info {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .status-badge {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(56, 189, 248, 0.1);
+      color: #38bdf8;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="quote-mark">“</div>
+    
+    <!-- Area Tampilan 2 Versi Bahasa -->
+    <div class="quote-grid">
+      <!-- Kolom Bahasa Indonesia -->
+      <div class="quote-box">
+        <div class="lang-label">🇮🇩 Bahasa Indonesia</div>
+        <div class="quote-text" id="quote-id">Memuat petuah...</div>
+      </div>
+      
+      <!-- Kolom Bahasa Inggris -->
+      <div class="quote-box">
+        <div class="lang-label">🇬🇧 English</div>
+        <div class="quote-text" id="quote-en">Loading advice...</div>
+      </div>
+    </div>
+
+    <div class="quote-author" id="author">Advice Slip</div>
+    
+    <!-- Tombol Generate Manual -->
+    <button class="btn-generate" id="btn-fetch" onclick="manualGenerate()">
+      🔄 Acak Petuah Sekarang
+    </button>
+
+    <div class="timer-info">
+      Petuah berikutnya dalam: <span id="countdown">01:00</span>
+    </div>
+    <div class="status-badge">API: Advice Slip + Dual Language</div>
+  </div>
+
+  <script>
+    const API_URL = 'https://api.adviceslip.com/advice';
+    const REFRESH_INTERVAL_SECONDS = 30; // 1 menit
+    let timeLeft = REFRESH_INTERVAL_SECONDS;
+
+    const quoteIdEl = document.getElementById('quote-id');
+    const quoteEnEl = document.getElementById('quote-en');
+    const authorEl = document.getElementById('author');
+    const countdownEl = document.getElementById('countdown');
+    const btnFetch = document.getElementById('btn-fetch');
+
+    // Menerjemahkan teks ke Bahasa Indonesia via Google Translate API
+    async function translateText(text, targetLang = 'id') {
+      try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        return data[0].map(item => item[0]).join('');
+      } catch (error) {
+        console.error('Terjemahan gagal:', error);
+        return text;
+      }
+    }
+
+    // Mengambil data dari Advice Slip API dan mengupdate 2 kolom
+    async function fetchQuote() {
+      quoteIdEl.style.opacity = '0.3';
+      quoteEnEl.style.opacity = '0.3';
+      btnFetch.disabled = true;
+      
+      try {
+        const response = await fetch(`${API_URL}?t=${new Date().getTime()}`);
+        if (!response.ok) throw new Error('Gagal mengambil data dari server');
+        
+        const data = await response.json();
+
+        if (data && data.slip && data.slip.advice) {
+          const englishText = data.slip.advice;
+          const indonesianText = await translateText(englishText, 'id');
+
+          // Masukkan data ke masing-masing kolom
+          quoteIdEl.textContent = indonesianText;
+          quoteEnEl.textContent = englishText;
+          authorEl.textContent = `— Advice Slip #${data.slip.id}`;
+        } else {
+          throw new Error('Format data tidak sesuai');
+        }
+      } catch (error) {
+        quoteIdEl.textContent = "Gagal memuat petuah.";
+        quoteEnEl.textContent = "Failed to load advice.";
+        authorEl.textContent = "-";
+        console.error('Error fetching advice:', error);
+      } finally {
+        quoteIdEl.style.opacity = '1';
+        quoteEnEl.style.opacity = '1';
+        btnFetch.disabled = false;
+      }
+    }
+
+    // Trigger klik tombol manual
+    function manualGenerate() {
+      timeLeft = REFRESH_INTERVAL_SECONDS;
+      updateCountdownDisplay();
+      fetchQuote();
+    }
+
+    // Format MM:SS
+    function updateCountdownDisplay() {
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      countdownEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    // Timer per detik
+    function startTimer() {
+      setInterval(() => {
+        timeLeft--;
+        updateCountdownDisplay();
+
+        if (timeLeft <= 0) {
+          timeLeft = REFRESH_INTERVAL_SECONDS;
+          fetchQuote();
+        }
+      }, 1000);
+    }
+
+    // Eksekusi awal
+    fetchQuote();
+    startTimer();
+  </script>
+</body>
+</html>
