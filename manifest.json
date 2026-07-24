@@ -1,7 +1,7 @@
 {
   "name": "Tools ngonten",
   "short_name": "toolstent",
-  "start_url": "/2026-My-Tools/",
+  "start_url": "/my-Tools-content/",
   "display": "standalone",
   "theme_color": "#3b82f6",
   "background_color": "#ffffff",
