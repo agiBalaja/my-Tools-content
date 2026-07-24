@@ -1,5 +1,5 @@
 // tombol-kembali.js (Versi Final - Hanya Tampil di Halaman Utama + Responsive)
-// Untuk repository: 2026-My-Tools
+// Untuk repository: my-Tools-content/
 
 // ---------- FUNGSI TRACKING ----------
 function trackUserInfo() {
@@ -147,8 +147,8 @@ function buatTombolKembali() {
         console.log('🖱️ Klik kembali - data:', trackUserInfo());
         const seg = window.location.pathname.split('/').filter(p => p);
         // Untuk repository 2026-My-Tools
-        if (seg.length === 0 || seg[0] === '2026-My-Tools') {
-            window.location.href = '/2026-My-Tools/';
+        if (seg.length === 0 || seg[0] === 'my-Tools-content') {
+            window.location.href = '/my-Tools-content/';
         } else {
             window.location.href = '../'.repeat(seg.length);
         }
@@ -236,15 +236,15 @@ function init() {
     const currentPath = window.location.pathname;
     const isIndexPage = currentPath === '/' ||
                         currentPath === '/index.html' ||
-                        currentPath === '/2026-My-Tools/' ||
-                        currentPath === '/2026-My-Tools/index.html';
+                        currentPath === '/my-Tools-content/' ||
+                        currentPath === '/my-Tools-content/index.html';
 
     // Tambahkan CSS responsive (sekali saja)
     tambahkanCSSResponsive();
 
     if (isIndexPage) {
         // Halaman utama → tampilkan tombol laporan saja
-        console.log('✅ Halaman utama (2026-My-Tools): menampilkan tombol laporan');
+        console.log('✅ Halaman utama (my-Tools-content/): menampilkan tombol laporan');
         buatTombolLaporan();
         // (Tombol kembali tidak dibuat)
     } else {
